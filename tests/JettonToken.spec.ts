@@ -9,7 +9,7 @@ describe('JettonToken', () => {
     let deployer: SandboxContract<TreasuryContract>;
     let jettonToken: SandboxContract<JettonToken>;
 
-    beforeEach(async () => {
+     beforeEach(async () => {
         blockchain = await Blockchain.create();
         deployer = await blockchain.treasury('deployer');
 
@@ -33,7 +33,6 @@ describe('JettonToken', () => {
             receiver: deployer.address
         });
 
-
         expect(deployResult.transactions).toHaveTransaction({
             from: deployer.address,
             to: jettonToken.address,
@@ -43,7 +42,7 @@ describe('JettonToken', () => {
     });
 
     it('should mint using Mint message', async () => {
-        const mintAmount = 1000000000n;
+        const mintAmount = 1_000_000_000n;
 
         const result = await jettonToken.send(deployer.getSender(), {
             value: toNano('0.05'),
@@ -61,12 +60,14 @@ describe('JettonToken', () => {
 
         const data = await jettonToken.getGetJettonData();
         expect(data.totalSupply).toBe(mintAmount);
-        expect(data.mintable).toBe(true);
         expect(data.owner.toString()).toEqual(deployer.address.toString());
+
+        const mintable = await jettonToken.getIsMintable();
+        expect(mintable).toBe(true);
     });
 
     it('should mint using MintPublic', async () => {
-        const mintAmount = 123456789n;
+        const mintAmount = 123_456_789n;
         const minter = await blockchain.treasury('minter');
 
         const result = await jettonToken.send(minter.getSender(), {
@@ -84,7 +85,9 @@ describe('JettonToken', () => {
 
         const data = await jettonToken.getGetJettonData();
         expect(data.totalSupply).toBe(mintAmount);
-        expect(data.mintable).toBe(true);
+
+        const mintable = await jettonToken.getIsMintable();
+        expect(mintable).toBe(true);
     });
 
     it('should disable minting after MintClose', async () => {
@@ -98,7 +101,7 @@ describe('JettonToken', () => {
             success: true,
         });
 
-        const data = await jettonToken.getGetJettonData();
-        expect(data.mintable).toBe(false);
+        const mintable = await jettonToken.getIsMintable();
+        expect(mintable).toBe(false);
     });
 });

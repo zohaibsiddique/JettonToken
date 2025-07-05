@@ -48,7 +48,6 @@ contract JettonToken with Jetton {
 
 struct JettonData {
     totalSupply: Int;
-    mintable: Bool;
     owner: Address;
     content: Cell;
     walletCode: Cell;
@@ -123,12 +122,12 @@ trait Jetton with Ownable {
         return initOf JettonDefaultWallet(myAddress(), address);
     }
 
+
     // ====== Get Methods ====== //
     get fun get_jetton_data(): JettonData {
         let code: Cell = self.getJettonWalletInit(myAddress()).code;
         return JettonData{ 
             totalSupply: self.totalSupply, 
-            mintable: self.mintable, 
             owner: self.owner, 
             content: self.content, 
             walletCode: code
@@ -139,6 +138,36 @@ trait Jetton with Ownable {
         let winit: StateInit = self.getJettonWalletInit(owner);
         return contractAddress(winit);
     }
+
+    get fun is_mintable(): Bool {
+        return self.mintable;
+    }
+
+    get fun get_name(): String {
+        return "Dino Dazzle";
+    }
+    get fun get_symbol(): String {
+        return "DINOS";
+    }
+    
+    get fun get_decimals(): Int {
+        return 9; // TEP-74 standard
+    }
+    
+    get fun get_max_supply(): Int {
+        return self.max_supply;
+    }
+    get fun get_total_supply(): Int {
+        return self.totalSupply;
+    }
+    get fun get_owner(): Address {
+        return self.owner;
+    }
+    get fun get_content(): Cell {
+        return self.content;
+    }
+
+
 }
 // ============================================================ //
 @interface("org.ton.jetton.wallet")
